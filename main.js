@@ -12,15 +12,15 @@ automater.setFlags('l', {
 })
 
 automater.setFlags('f', {
-    long: '----flag',
+    long: 'flag',
     func: (val) => {
         console.log('this is for flag ', val)
     }
 })
 
 automater.setFunc(function(flags, aflags) {
-    //automater.runCommand('ls ./');
-    console.log({ gsh: automater.getCommandLogs() })
+    automater.runCommand('ls -lh ./');
+    console.log({ gsh: aflags })
 })
 
 automater.run();

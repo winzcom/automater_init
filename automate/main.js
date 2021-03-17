@@ -11,6 +11,7 @@ class Automate {
         this.password;
         this.sdi
         this.flags = {}
+        this.command_running = false;
         this.flagset = {}
         this.aflags = []
         this.command_logs = ''
@@ -82,6 +83,7 @@ class Automate {
     }
 
     runCommand(command) {
+        this.command_running = true;
         const ls = exec(command);
         this.lsStdin = ls.stdin;
         this.lsStdout = ls.stdout;
@@ -102,6 +104,7 @@ class Automate {
         })
 
         this.lsStdout.on('end', () => {
+            this.command_running = false;
             this.curStdin.pause();
             this.curStdin.end();
             this.command_done = true;
@@ -109,6 +112,9 @@ class Automate {
     }
 
     setCommandLogs() {
+        if(!this.command_running) {
+            return Promise.resolve('no commands running');
+        }
         return new Promise((res, rej) => {
             let timeout = setInterval(() => {
                 if(this.command_done) {
@@ -120,6 +126,10 @@ class Automate {
     }
 
     getCommandLogs() {
+        if(!this.command_running) {
+            return Promise.resolve('no commands running');
+        }
+        console.log('no commands')
         return this.setCommandLogs()
     }
 }
