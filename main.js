@@ -25,7 +25,6 @@ automater.setFlags('f', {
     func: function(val) {
         console.log('f value ', val)
     },
-    required: true,
 })
 automater.setHelpLog(`
 Usage

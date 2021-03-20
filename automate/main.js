@@ -62,7 +62,7 @@ class Automate {
                         if(!this.flags[pool]) {
                             this.flagset[flag] = args[++i];
                         }
-                    } else if(!this.flagset[flag]) { this.flagset[flag] = {} }
+                    }
                     if(this.flags[flag].long && this.flagset[this.flags[flag].long]) {
                         delete this.flagset[this.flags[flag].long];
                     } else if(this.flags[flag].short) {
@@ -79,12 +79,9 @@ class Automate {
                 } else {
                     this.aflags.push(flag)
                 }
-               if(this.flags[flag] && !this.flagset[flag]) {
-                   if(this.flags[flag].required) {
-                       throw new Error(`Flag ${flag} is required`);
-                   }
-                   this.flagset[flag] = {}
-               }
+               if(this.flags[flag] && !this.flagset[flag] && this.flags[flag].required) {
+                    throw new Error(`Flag ${flag} is required`);
+               } else this.flagset[flag] = {}
             }
             this.runFlaggers();
         }
