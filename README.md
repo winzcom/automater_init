@@ -1,4 +1,4 @@
 # automater_init
 It a simple cli. No dependencies. Small size
 
-You can set the flags with attributes like function to run when set and if it is required
+You can set each flags with functions to run, if it required and a long name version
