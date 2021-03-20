@@ -3,17 +3,18 @@
 const { exec } = require('child_process');
 
 class Automate {
-    constructor() {
+    constructor(options) {
         if(Automate.instance) {
             return Automate.instance;
         }
         this.username;
         this.password;
         this.sdi
-        this.flags = {}
+        this.flags = options.flags || {}
         this.command_running = false;
         this.flagset = {}
         this.aflags = []
+        this.flaggers = []
         this.command_logs = ''
         this.command_done = false;
         this.lsStdin
@@ -22,11 +23,19 @@ class Automate {
         this.func;
         this.sdo = process.stdout;
         Automate.instance = this
+
+        let op = Object.keys(this.flags);
+        console.log({ op: this.flags[op[0]].long })
+        for(let i = 0; i < op.length; i +=1) {
+            if(this.flags[op[i]].long) {
+                let long = '-' + this.flags[op[i]].long.replace(/_|-/g, '')
+                this.flags[long] = { ...this.flags[op[i]], short: op[i], long: undefined }
+            }
+        }
         return Automate.instance;
     }
     
     setFlags(val, options = {}) {
-        //console.log({ klk: options })
         this.flags[val] = { ...options }
         if(options.long) {
             let long = '-' + options.long.replace(/_|-/g, '')
@@ -53,7 +62,7 @@ class Automate {
                         if(!this.flags[pool]) {
                             this.flagset[flag] = args[++i];
                         }
-                    } else if(!this.flagset[flag]) { this.flagset[flag] = true }
+                    } else if(!this.flagset[flag]) { this.flagset[flag] = {} }
                     if(this.flags[flag].long && this.flagset[this.flags[flag].long]) {
                         delete this.flagset[this.flags[flag].long];
                     } else if(this.flags[flag].short) {
@@ -64,12 +73,20 @@ class Automate {
                     }
                     let flagger = this.flags[flag].short || flag;
                     if(this.flags[flagger].func && typeof this.flags[flagger].func == 'function') {
-                        this.flags[flagger].func(this.flagset[flagger]);
+                        this.flaggers.push(flagger)
+                        
                     }
                 } else {
                     this.aflags.push(flag)
                 }
+               if(this.flags[flag] && !this.flagset[flag]) {
+                   if(this.flags[flag].required) {
+                       throw new Error(`Flag ${flag} is required`);
+                   }
+                   this.flagset[flag] = {}
+               }
             }
+            this.runFlaggers();
         }
     }
 
@@ -79,10 +96,17 @@ class Automate {
 
     run() {
         this.readFlags();
+        if(this.flagset.h) {
+            return
+        }
+        console.log({ the: this.flagset })
         this.func(this.flagset, this.aflags);
     }
 
     runCommand(command) {
+        if(this.flagset.h) {
+            return
+        } 
         this.command_running = true;
         const ls = exec(command);
         this.lsStdin = ls.stdin;
@@ -111,6 +135,15 @@ class Automate {
         })
     }
 
+    runFlaggers() {
+        if(this.flagset.h) {
+            return this.flags.h.func.apply(null)
+        }
+        for(let i = 0; i < this.flaggers.length; i += 1) {
+            this.flags[this.flaggers[i]].func.apply(null, [this.flagset[this.flaggers[i]]]);
+        }
+    }
+
     setCommandLogs() {
         if(!this.command_running) {
             return Promise.resolve('no commands running');
@@ -131,6 +164,21 @@ class Automate {
         }
         console.log('no commands')
         return this.setCommandLogs()
+    }
+
+    setHelpLog = (func) => {
+        let type = typeof func;
+        if(type == 'string') {
+            this.setFlags('h', {
+                long: 'help',
+                func: () => console.log(func)
+            })
+        } else if(type == 'function') {
+            this.setFlags('h', {
+                long: 'help',
+                func,
+            })
+        }
     }
 }
 
