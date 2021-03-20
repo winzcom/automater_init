@@ -40,7 +40,7 @@ Examples
 `);
 
 automater.setFunc(function(flags, aflags) {
-    //automater.runCommand(`echo ${flags} ${aflags}`);
+    console.log({ flags, aflags })
 })
 
 automater.run();

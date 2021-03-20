@@ -10,7 +10,7 @@ class Automate {
         this.username;
         this.password;
         this.sdi
-        this.flags = options.flags || {}
+        this.flags = options ? options.flags : {}
         this.command_running = false;
         this.flagset = {}
         this.aflags = []
@@ -25,7 +25,6 @@ class Automate {
         Automate.instance = this
 
         let op = Object.keys(this.flags);
-        console.log({ op: this.flags[op[0]].long })
         for(let i = 0; i < op.length; i +=1) {
             if(this.flags[op[i]].long) {
                 let long = '-' + this.flags[op[i]].long.replace(/_|-/g, '')
@@ -79,9 +78,11 @@ class Automate {
                 } else {
                     this.aflags.push(flag)
                 }
-               if(this.flags[flag] && !this.flagset[flag] && this.flags[flag].required) {
-                    throw new Error(`Flag ${flag} is required`);
-               } else this.flagset[flag] = {}
+               if(this.flags[flag] && !this.flagset[flag] ) {
+                   if(this.flags[flag].required)
+                        throw new Error(`Flag ${flag} is required`);
+                    else this.flagset[flag] = {}
+               } 
             }
             this.runFlaggers();
         }
@@ -176,6 +177,13 @@ class Automate {
                 func,
             })
         }
+    }
+
+    setFlagValue = (flag, val) => {
+        if(!this.flags[flag]) {
+            throw new Error(`Flag ${flag} is not set`);
+        }
+        this.flagset[flag] = val;
     }
 }
 
