@@ -101,7 +101,7 @@ class Automate {
         this.func(this.flagset, this.aflags);
     }
 
-    runCommand(command) {
+    runCommand(command, log = true) {
         if(this.flagset.h) {
             return
         } 
@@ -111,14 +111,15 @@ class Automate {
         this.lsStdout = ls.stdout;
         this.curStdin = process.stdin;
 
-        this.setUpListenerOnCli();
+        this.setUpListenerOnCli(log);
     }
 
-    setUpListenerOnCli() {
+    setUpListenerOnCli(log = true) {
         this.lsStdout.on('data', (data) => {
             this.command_logs += data;
-            this.curStdin.write(data);
-            this.curStdin.resume();
+            if(log) {
+                this.curStdin.write(data);
+            }
         })
 
         this.curStdin.on('data', (data) => {
@@ -160,7 +161,6 @@ class Automate {
         if(!this.command_running) {
             return Promise.resolve('no commands running');
         }
-        console.log('no commands')
         return this.setCommandLogs()
     }
 

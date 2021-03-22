@@ -1,5 +1,5 @@
 {
-  "name": "auotmate",
+  "name": "test",
   "version": "1.0.0",
   "main": "main.js",
   "directories": {
@@ -20,5 +20,13 @@
   "description": "This is to automate things",
   "keywords": [
     "run"
-  ]
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/winzcom/automater_init.git"
+  },
+  "bugs": {
+    "url": "https://github.com/winzcom/automater_init/issues"
+  },
+  "homepage": "https://github.com/winzcom/automater_init#readme"
 }

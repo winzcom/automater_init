@@ -40,7 +40,8 @@ Examples
 `);
 
 automater.setFunc(function(flags, aflags) {
-    console.log({ flags, aflags })
+    automater.runCommand('npm init');
+    automater.getCommandLogs().then(console.log)
 })
 
 automater.run();
