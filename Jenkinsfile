@@ -4,9 +4,7 @@ pipeline {
         registerCred = 'docker-hub'
         dI = ''
     }
-    agent {
-        dockerfile true
-    }
+    agent any
     stages {
         stage('build image') {
             steps {
